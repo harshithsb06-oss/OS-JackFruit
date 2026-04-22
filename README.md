@@ -1,111 +1,220 @@
-# Multi-Container Runtime
+# Multi-Container Runtime (OS Project)
 
-A lightweight Linux container runtime in C with a long-running supervisor and a kernel-space memory monitor.
+## 👤 Student Details
 
-Read [`project-guide.md`](project-guide.md) for the full project specification.
+* **SRN:** PES1UG24CS574
+  **Name:** Harshith S B
+
+* **SRN:** PES1UG25CS596
+  **Name:** Prasanna Pujari
 
 ---
 
-## Getting Started
 
-### 1. Fork the Repository
+## 📌 Overview
 
-1. Go to [github.com/shivangjhalani/OS-Jackfruit](https://github.com/shivangjhalani/OS-Jackfruit)
-2. Click **Fork** (top-right)
-3. Clone your fork:
+This project implements a lightweight container runtime with:
 
-```bash
-git clone https://github.com/<your-username>/OS-Jackfruit.git
-cd OS-Jackfruit
-```
+* Multi-container supervision
+* Metadata tracking
+* Bounded-buffer logging
+* CLI + IPC communication
+* Resource limit enforcement (soft & hard)
+* Scheduling experiments
+* Clean teardown
 
-### 2. Set Up Your VM
+---
 
-You need an **Ubuntu 22.04 or 24.04** VM with **Secure Boot OFF**. WSL will not work.
-
-Install dependencies:
+## ⚙️ Setup Instructions
 
 ```bash
 sudo apt update
 sudo apt install -y build-essential linux-headers-$(uname -r)
-```
 
-### 3. Run the Environment Check
+cd boilerplate/
+mkdir -p rootfs
 
-```bash
-cd boilerplate
-chmod +x environment-check.sh
-sudo ./environment-check.sh
-```
-
-Fix any issues reported before moving on.
-
-### 4. Prepare the Root Filesystem
-
-```bash
-mkdir rootfs-base
 wget https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/x86_64/alpine-minirootfs-3.20.3-x86_64.tar.gz
-tar -xzf alpine-minirootfs-3.20.3-x86_64.tar.gz -C rootfs-base
+tar -xzf alpine-minirootfs-3.20.3-x86_64.tar.gz -C rootfs
+rm alpine-minirootfs-3.20.3-x86_64.tar.gz
 
-# Make one writable copy per container you plan to run
-cp -a ./rootfs-base ./rootfs-alpha
-cp -a ./rootfs-base ./rootfs-beta
-```
+mkdir -p logs
 
-Do not commit `rootfs-base/` or `rootfs-*` directories to your repository.
-
-### 5. Understand the Boilerplate
-
-The `boilerplate/` folder contains starter files:
-
-| File                   | Purpose                                             |
-| ---------------------- | --------------------------------------------------- |
-| `engine.c`             | User-space runtime and supervisor skeleton          |
-| `monitor.c`            | Kernel module skeleton                              |
-| `monitor_ioctl.h`      | Shared ioctl command definitions                    |
-| `Makefile`             | Build targets for both user-space and kernel module |
-| `cpu_hog.c`            | CPU-bound test workload                             |
-| `io_pulse.c`           | I/O-bound test workload                             |
-| `memory_hog.c`         | Memory-consuming test workload                      |
-| `environment-check.sh` | VM environment preflight check                      |
-
-Use these as your starting point. You are free to restructure the repository however you want — the submission requirements are listed in the project guide.
-
-### 6. Build and Verify
-
-```bash
-cd boilerplate
+make clean
 make
 ```
 
-If this compiles without errors, your environment is ready.
+---
 
-### 7. GitHub Actions Smoke Check
+## 🚀 Execution Steps
 
-Your fork will inherit a minimal GitHub Actions workflow from this repository.
-
-That workflow only performs CI-safe checks:
-
-- `make -C boilerplate ci`
-- user-space binary compilation (`engine`, `memory_hog`, `cpu_hog`, `io_pulse`)
-- `./boilerplate/engine` with no arguments must print usage and exit with a non-zero status
-
-The CI-safe build command is:
+### Terminal 1 (Supervisor)
 
 ```bash
-make -C boilerplate ci
+sudo insmod monitor.ko
+sudo ./engine supervisor ./rootfs
 ```
 
-This smoke check does not test kernel-module loading, supervisor runtime behavior, or container execution.
+### Terminal 2 (Start Containers)
+
+```bash
+sudo ./engine start alpha ./rootfs "sleep 30"
+sudo ./engine start beta ./rootfs "sleep 30"
+```
 
 ---
 
-## What to Do Next
+# 📸 Demonstrations (With Screenshots)
 
-Read [`project-guide.md`](project-guide.md) end to end. It contains:
+---
 
-- The six implementation tasks (multi-container runtime, CLI, logging, kernel monitor, scheduling experiments, cleanup)
-- The engineering analysis you must write
-- The exact submission requirements, including what your `README.md` must contain (screenshots, analysis, design decisions)
+## 1️⃣ Multi-container Supervision
 
-Your fork's `README.md` should be replaced with your own project documentation as described in the submission package section of the project guide. (As in get rid of all the above content and replace with your README.md)
+✔ Two containers running under a single supervisor
+
+![Multi Container](screenshots/s1_s2.jpeg)
+
+---
+
+## 2️⃣ Metadata Tracking
+
+✔ Shows container details using `ps`
+
+```bash
+sudo ./engine ps
+```
+
+![Metadata Tracking](screenshots/s1_s2.jpeg)
+
+---
+
+## 3️⃣ Bounded-buffer Logging
+
+✔ Logging pipeline showing container activity
+
+```bash
+sudo ./engine start alpha ./rootfs "/bin/sh -c 'echo Alpha is running... && sleep 5'"
+sudo ./engine start gamma ./rootfs "/bin/sh -c 'echo Gamma running && sleep 40'"
+```
+
+![Logging Output](screenshots/s3.jpeg)
+
+---
+
+## 4️⃣ CLI and IPC
+
+✔ CLI command interacting with supervisor
+
+```bash
+sudo ./engine stop gamma
+```
+
+![CLI IPC Screenshot 1](screenshots/s4_1.jpeg)
+![CLI IPC Screenshot 2](screenshots/s4_2.jpeg)
+
+---
+
+## 5️⃣ Soft-limit Warning
+
+✔ Memory soft-limit warning using `dmesg`
+
+```bash
+cp memory_hog rootfs/
+sudo ./engine start memtest ./rootfs /memory_hog --soft-mib 20 --hard-mib 40
+sudo dmesg | grep container_monitor
+```
+
+![Soft Limit 1](screenshots/s5_1.jpeg)
+![Soft Limit 2](screenshots/s5_2.jpeg)
+![Soft Limit 3](screenshots/s5_3.jpeg)
+
+---
+
+## 6️⃣ Hard-limit Enforcement
+
+✔ Container killed after exceeding hard limit
+
+```bash
+sudo ./engine ps
+```
+
+![Hard Limit](screenshots/s6.jpeg)
+
+---
+
+## 7️⃣ Scheduling Experiment
+
+✔ CPU scheduling using priority (`nice`)
+
+```bash
+cp cpu_hog ./rootfs/
+cp io_pulse ./rootfs/
+
+sudo ./engine start cpu-high ./rootfs "/cpu_hog 30" --nice -10
+sudo ./engine start cpu-low ./rootfs "/cpu_hog 30" --nice -10
+
+sudo ./engine logs cpu-high
+sudo ./engine logs cpu-low
+```
+
+![Scheduling Output](screenshots/s7.jpeg)
+
+---
+
+## 8️⃣ Clean Teardown
+
+✔ No zombie processes after shutdown
+
+```bash
+sudo rmmod monitor
+ps aux | grep -E 'Z|defunct'
+```
+
+![Teardown 1](screenshots/s8_1.jpeg)
+![Teardown 2](screenshots/s8_2.jpeg)
+
+---
+
+# 📊 Features Summary
+
+| Feature     | Description                          |
+| ----------- | ------------------------------------ |
+| Supervision | Multiple containers handled together |
+| Metadata    | Tracking via `engine ps`             |
+| Logging     | Producer-consumer logging pipeline   |
+| IPC         | CLI ↔ Supervisor communication       |
+| Limits      | Soft & Hard memory control           |
+| Scheduling  | Priority-based execution             |
+| Cleanup     | No zombie processes                  |
+
+---
+
+# 🧠 Concepts Used
+
+* Linux namespaces
+* Kernel module (`monitor.ko`)
+* Inter-process communication (IPC)
+* Scheduling (`nice`)
+* Memory monitoring
+
+---
+
+# ✅ Conclusion
+
+This project successfully demonstrates the design and implementation of a lightweight container runtime with monitoring capabilities.
+
+From the experimental results and screenshots:
+
+* Multiple containers were executed and managed simultaneously under a single supervisor, proving effective **multi-container supervision**.
+* The `engine ps` output confirmed accurate **metadata tracking**, including PID, state, and resource limits.
+* The logging mechanism showed proper **bounded-buffer behavior**, capturing container outputs without loss.
+* CLI commands interacted correctly with the supervisor, validating the implementation of **IPC mechanisms**.
+* Memory control was effectively enforced:
+
+  * **Soft limit warnings** were observed through `dmesg`
+  * **Hard limit enforcement** resulted in container termination (e.g., `memtest`)
+* Scheduling experiments using `nice` values demonstrated **CPU prioritization differences** between containers.
+* Finally, system shutdown logs and process checks confirmed **clean teardown**, with no zombie (`defunct`) processes remaining.
+
+.
+
