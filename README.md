@@ -1,6 +1,6 @@
 # Multi-Container Runtime (OS Project)
 
-## 👤 Student Details
+## ?? Student Details
 
 * **SRN:** PES1UG24CS574
   **Name:** Harshith S B
@@ -8,10 +8,12 @@
 * **SRN:** PES1UG25CS596
   **Name:** Prasanna Pujari
 
+* **SRN:** PES1UG24CS587
+  **Name:** PAVAN R LAMANI
 ---
 
 
-## 📌 Overview
+## ?? Overview
 
 This project implements a lightweight container runtime with:
 
@@ -25,7 +27,7 @@ This project implements a lightweight container runtime with:
 
 ---
 
-## ⚙️ Setup Instructions
+## ?? Setup Instructions
 
 ```bash
 sudo apt update
@@ -46,7 +48,7 @@ make
 
 ---
 
-## 🚀 Execution Steps
+## ?? Execution Steps
 
 ### Terminal 1 (Supervisor)
 
@@ -64,21 +66,21 @@ sudo ./engine start beta ./rootfs "sleep 30"
 
 ---
 
-# 📸 Demonstrations (With Screenshots)
+# ?? Demonstrations (With Screenshots)
 
 ---
 
-## 1️⃣ Multi-container Supervision
+## 1?? Multi-container Supervision
 
-✔ Two containers running under a single supervisor
+? Two containers running under a single supervisor
 
 ![Multi Container](screenshots/s1_s2.jpeg)
 
 ---
 
-## 2️⃣ Metadata Tracking
+## 2?? Metadata Tracking
 
-✔ Shows container details using `ps`
+? Shows container details using `ps`
 
 ```bash
 sudo ./engine ps
@@ -88,9 +90,9 @@ sudo ./engine ps
 
 ---
 
-## 3️⃣ Bounded-buffer Logging
+## 3?? Bounded-buffer Logging
 
-✔ Logging pipeline showing container activity
+? Logging pipeline showing container activity
 
 ```bash
 sudo ./engine start alpha ./rootfs "/bin/sh -c 'echo Alpha is running... && sleep 5'"
@@ -101,9 +103,9 @@ sudo ./engine start gamma ./rootfs "/bin/sh -c 'echo Gamma running && sleep 40'"
 
 ---
 
-## 4️⃣ CLI and IPC
+## 4?? CLI and IPC
 
-✔ CLI command interacting with supervisor
+? CLI command interacting with supervisor
 
 ```bash
 sudo ./engine stop gamma
@@ -114,9 +116,9 @@ sudo ./engine stop gamma
 
 ---
 
-## 5️⃣ Soft-limit Warning
+## 5?? Soft-limit Warning
 
-✔ Memory soft-limit warning using `dmesg`
+? Memory soft-limit warning using `dmesg`
 
 ```bash
 cp memory_hog rootfs/
@@ -130,9 +132,9 @@ sudo dmesg | grep container_monitor
 
 ---
 
-## 6️⃣ Hard-limit Enforcement
+## 6?? Hard-limit Enforcement
 
-✔ Container killed after exceeding hard limit
+? Container killed after exceeding hard limit
 
 ```bash
 sudo ./engine ps
@@ -142,9 +144,9 @@ sudo ./engine ps
 
 ---
 
-## 7️⃣ Scheduling Experiment
+## 7?? Scheduling Experiment
 
-✔ CPU scheduling using priority (`nice`)
+? CPU scheduling using priority (`nice`)
 
 ```bash
 cp cpu_hog ./rootfs/
@@ -161,9 +163,9 @@ sudo ./engine logs cpu-low
 
 ---
 
-## 8️⃣ Clean Teardown
+## 8?? Clean Teardown
 
-✔ No zombie processes after shutdown
+? No zombie processes after shutdown
 
 ```bash
 sudo rmmod monitor
@@ -175,21 +177,21 @@ ps aux | grep -E 'Z|defunct'
 
 ---
 
-# 📊 Features Summary
+# ?? Features Summary
 
 | Feature     | Description                          |
 | ----------- | ------------------------------------ |
 | Supervision | Multiple containers handled together |
 | Metadata    | Tracking via `engine ps`             |
 | Logging     | Producer-consumer logging pipeline   |
-| IPC         | CLI ↔ Supervisor communication       |
+| IPC         | CLI ? Supervisor communication       |
 | Limits      | Soft & Hard memory control           |
 | Scheduling  | Priority-based execution             |
 | Cleanup     | No zombie processes                  |
 
 ---
 
-# 🧠 Concepts Used
+# ?? Concepts Used
 
 * Linux namespaces
 * Kernel module (`monitor.ko`)
@@ -199,7 +201,7 @@ ps aux | grep -E 'Z|defunct'
 
 ---
 
-# ✅ Conclusion
+# ? Conclusion
 
 This project successfully demonstrates the design and implementation of a lightweight container runtime with monitoring capabilities.
 
@@ -217,4 +219,5 @@ From the experimental results and screenshots:
 * Finally, system shutdown logs and process checks confirmed **clean teardown**, with no zombie (`defunct`) processes remaining.
 
 .
+
 
